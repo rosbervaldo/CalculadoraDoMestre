@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mestre das Massas - Calculadora Samurai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
+  <style>
+    /* Fundo com imagem PNG transparente centralizada, fixa e fundo escuro */
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #1b1b1b; /* fundo preto escuro */
+      background-image: url('https://i.ibb.co/20tCNk3D/427810629-7372797582765159-636898905085413006-n-LE-upscale-balanced-light-ai-30-remove-background-ge.png');
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-attachment: fixed;
+      background-size: auto 400px; /* mantém proporção, altura fixa */
+      color: #f5f0e6;
+      max-width: 650px;
+      margin: 2rem auto 4rem;
+      box-shadow: 0 0 50px #800000a0 inset;
+      border-radius: 12px;
+      padding: 20px 30px 40px;
+      user-select: none;
+    }
+
+    h1 {
+      font-family: 'Sawarabi Mincho', serif;
+      font-size: 2.8rem;
+      color: #d9452c;
+      text-align: center;
+      text-shadow: 2px 2px 4px #000;
+      margin-bottom: 1rem;
+      user-select: text;
+    }
+
+    label, fieldset {
+      display: block;
+      margin-top: 1.5rem;
+      user-select: text;
+    }
+
+    fieldset {
+      border: 2px solid #d9452c;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      background: #2a2a2a99;
+      box-shadow: inset 0 0 10px #660000aa;
+    }
+
+    legend {
+      font-weight: bold;
+      font-size: 1.3rem;
+      color: #d9452c;
+      padding: 0 10px;
+      user-select: text;
+    }
+
+    select, input[type=number], input[type=range] {
+      width: 100%;
+      padding: 8px 12px;
+      margin-top: 6px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1.8px solid #d9452c;
+      background-color: #1f1f1fdd;
+      color: #f5f0e6;
+      transition: border-color 0.3s ease;
+      user-select: text;
+    }
+    select:hover, input[type=number]:hover, input[type=range]:hover,
+    select:focus, input[type=number]:focus, input[type=range]:focus {
+      border-color: #ff6347;
+      outline: none;
+      background-color: #2c1b1bdd;
+    }
+
+    .ingrediente, .queijo {
+      display: flex;
+      align-items: center;
+      margin-top: 0.8rem;
+      user-select: none;
+    }
+
+    .ingrediente input[type=checkbox], .queijo input[type=checkbox] {
+      margin-right: 12px;
+      width: 20px; height: 20px;
+      cursor: pointer;
+      accent-color: #d9452c;
+    }
+
+    .ingrediente input[type=number], .queijo input[type=number] {
+      margin-left: auto;
+      width: 80px;
+      background-color: #1f1f1fcc;
+      border: 1.5px solid #d9452c;
+      color: #f5f0e6;
+      user-select: text;
+    }
+
+    button {
+      margin-top: 2rem;
+      padding: 1rem 0;
+      width: 100%;
+      font-size: 1.25rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #d9452c, #800000);
+      color: #f5f0e6;
+      box-shadow: 0 5px 15px #9b261ecc;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #ff6347, #aa2222);
+      box-shadow: 0 8px 20px #ff6347cc;
+    }
+
+    #resultado {
+      margin-top: 2.5rem;
+      padding: 1.5rem 2rem;
+      background: #3b2a22cc;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #d9452caa inset;
+      color: #f5f0e6;
+      user-select: text;
+    }
+
+    #resultado h2 {
+      font-family: 'Sawarabi Mincho', serif;
+      font-size: 2rem;
+      color: #ffb347;
+      text-shadow: 1px 1px 4px #000;
+      margin-bottom: 1rem;
+    }
+
+    #resultado h3 {
+      color: #f7d794;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      user-select: text;
+    }
+
+    #resultado p {
+      margin: 0.2rem 0;
+      user-select: text;
+    }
+
+    /* Label icons using emojis for a simple thematic touch */
+    label[for="massaTipo"]::before { content: "🍜 "; }
+    label[for^="ing_"]::before { content: "🥢 "; }
+    label[for^="queijo_"]::before { content: "🧀 "; }
+    label[for="conchaVermelho"]::before { content: "🍅 "; }
+    label[for="conchaBranco"]::before { content: "🥛 "; }
+    label[for="margem"]::before { content: "⚖️ "; }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      body {
+        margin: 1rem;
+        max-width: 100%;
+        padding: 1rem 1rem 2rem;
+      }
+      button {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Mestre das Massas</h1>
+
+  <label for="massaTipo">Tipo de massa:</label>
+  <select id="massaTipo" name="massaTipo">
+    <option value="P">P (550 g)</option>
+    <option value="M">M (800 g)</option>
+    <option value="G">G (1250 g)</option>
+  </select>
+
+  <fieldset>
+    <legend>Ingredientes (até 5)</legend>
+    <div id="ingredientes"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Molhos (Conchas)</legend>
+    <label for="conchaVermelho">Molho Vermelho:</label>
+    <select id="conchaVermelho" name="conchaVermelho"></select>
+
+    <label for="conchaBranco">Molho Branco:</label>
+    <select id="conchaBranco" name="conchaBranco"></select>
+  </fieldset>
+
+  <fieldset>
+    <legend>Queijos (até 2)</legend>
+    <div id="queijos"></div>
+  </fieldset>
+
+  <label for="margem">Margem de segurança (0–100 g): <span id="margemValor">50</span> g</label>
+  <input type="range" id="margem" name="margem" min="0" max="100" value="50" />
+
+  <button id="calcularBtn" title="Calcular as quantidades exatas">Calcular Quantidades</button>
+
+  <div id="resultado" aria-live="polite" role="region" aria-label="Resultado da calculadora">
+    <h2>Recomendação de Pesos</h2>
+    <p><strong>Massa base fixa:</strong> <span id="resMassa">-</span> g</p>
+    <div id="resIngredientes"></div>
+    <div id="resMolhos"></div>
+    <div id="resQueijos"></div>
+    <div id="resTotal"></div>
+  </div>
+
+  <script>
+    const ingrLista = [
+      { nome: 'Frango', padrao: 100 },
+      { nome: 'Bacon', padrao: 80 },
+      { nome: 'Calabresa', padrao: 90 },
+      { nome: 'Batata Palha', padrao: 60 },
+      { nome: 'Champignon', padrao: 70 },
+      { nome: 'Tomate', padrao: 50 },
+      { nome: 'Salsicha', padrao: 80 },
+      { nome: 'Milho', padrao: 50 },
+      { nome: 'Carne Moída', padrao: 120 },
+      { nome: 'Presunto', padrao: 80 },
+      { nome: 'Azeitona', padrao: 40 }
+    ];
+
+    const queijoLista = [
+      { nome: 'Queijo Minas', padrao: 50 },
+      { nome: 'Queijo Cheddar', padrao: 60 },
+      { nome: 'Queijo Catupiry', padrao: 55 }
+    ];
+
+    const pesoVermelhoTotal = 235;
+    const pesoBrancoTotal = 260;
+    const pesoPorConchaVermelho = pesoVermelhoTotal / 3;
+    const pesoPorConchaBranco = pesoBrancoTotal / 3;
+
+    const pesoMassaPorTipo = { P: 125, M: 225, G: 325 };
+    const pesoMinimoPorTipo = { P: 500, M: 750, G: 1200 };
+
+    const maxIngr = 5;
+    const maxQueijos = 2;
+
+    const contIngredientes = document.getElementById('ingredientes');
+    ingrLista.forEach((ing, i) => {
+      const div = document.createElement('div');
+      div.className = 'ingrediente';
+      div.innerHTML = `
+        <input type="checkbox" id="ing_${i}" />
+        <label for="ing_${i}">${ing.nome}</label>
+        <input type="number" id="qty_${i}" value="${ing.padrao}" disabled min="0" /> g
+      `;
+      contIngredientes.appendChild(div);
+      const chk = div.querySelector('input[type=checkbox]');
+      const num = div.querySelector('input[type=number]');
+      chk.addEventListener('change', () => num.disabled = !chk.checked);
+    });
+
+    const contQueijos = document.getElementById('queijos');
+    queijoLista.forEach((q, i) => {
+      const div = document.createElement('div');
+      div.className = 'queijo';
+      div.innerHTML = `
+        <input type="checkbox" id="queijo_${i}" />
+        <label for="queijo_${i}">${q.nome}</label>
+        <input type="number" id="qtyq_${i}" value="${q.padrao}" disabled min="0" /> g
+      `;
+      contQueijos.appendChild(div);
+      const chk = div.querySelector('input[type=checkbox]');
+      const num = div.querySelector('input[type=number]');
+      chk.addEventListener('change', () => {
+        num.disabled = !chk.checked;
+        limitarQueijos();
+      });
+    });
+
+    function limitarQueijos() {
+      const checkboxes = Array.from(document.querySelectorAll('#queijos input[type=checkbox]'));
+      const checked = checkboxes.filter(c => c.checked);
+      if (checked.length >= maxQueijos) {
+        checkboxes.forEach(c => {
+          if (!c.checked) c.disabled = true;
+        });
+      } else {
+        checkboxes.forEach(c => c.disabled = false);
+      }
+    }
+
+    const massaTipo = document.getElementById('massaTipo');
+    const conchaVermelho = document.getElementById('conchaVermelho');
+    const conchaBranco = document.getElementById('conchaBranco');
+
+    function populaSelect(selectEl, max) {
+      selectEl.innerHTML = '';
+      for (let i = 0; i <= max; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = i;
+        selectEl.appendChild(opt);
+      }
+    }
+
+    function ajustarLimiteConchas() {
+      const tipo = massaTipo.value;
+      let max = tipo === 'P' ? 3 : tipo === 'M' ? 4 : 5;
+
+      populaSelect(conchaVermelho, max);
+      populaSelect(conchaBranco, max);
+
+      conchaVermelho.onchange = () => {
+        const vermelho = parseInt(conchaVermelho.value);
+        const restante = max - vermelho;
+        conchaBranco.value = restante >= 0 ? restante : 0;
+      };
+
+      conchaBranco.onchange = () => {
+        const branco = parseInt(conchaBranco.value);
+        const restante = max - branco;
+        conchaVermelho.value = restante >= 0 ? restante : 0;
+      };
+
+      conchaVermelho.value = 1;
+      conchaBranco.value = max - 1;
+    }
+
+    massaTipo.addEventListener('change', ajustarLimiteConchas);
+    ajustarLimiteConchas();
+
+    const margem = document.getElementById('margem');
+    const margemValor = document.getElementById('margemValor');
+    margem.addEventListener('input', () => margemValor.textContent = margem.value);
+
+    document.getElementById('calcularBtn').addEventListener('click', () => {
+      const tipo = massaTipo.value;
+      const pesoMassa = pesoMassaPorTipo[tipo];
+      const pesoMaximo = pesoMinimoPorTipo[tipo]; // usar essa variável como limite máximo
+
+      // Ingredientes
+      let somaIngr = 0;
+      let selecionadosIngr = 0;
+      const detalhesIngr = [];
+
+      ingrLista.forEach((ing, i) => {
+        const chk = document.getElementById(`ing_${i}`);
+        const qtyInput = document.getElementById(`qty_${i}`);
+        const qty = parseFloat(qtyInput.value) || 0;
+        if (chk.checked && selecionadosIngr < maxIngr) {
+          somaIngr += qty;
+          detalhesIngr.push({ nome: ing.nome, peso: qty, index: i, input: qtyInput });
+          selecionadosIngr++;
+        }
+      });
+
+      // Queijos
+      let somaQueijo = 0;
+      let selecionadosQueijo = 0;
+      const detalhesQueijo = [];
+
+      queijoLista.forEach((q, i) => {
+        const chk = document.getElementById(`queijo_${i}`);
+        const qtyInput = document.getElementById(`qtyq_${i}`);
+        const qty = parseFloat(qtyInput.value) || 0;
+        if (chk.checked && selecionadosQueijo < maxQueijos) {
+          somaQueijo += qty;
+          detalhesQueijo.push({ nome: q.nome, peso: qty, index: i, input: qtyInput });
+          selecionadosQueijo++;
+        }
+      });
+
+      // Molhos
+      const qtdVermelho = parseInt(conchaVermelho.value);
+      const qtdBranco = parseInt(conchaBranco.value);
+      const pesoMolho = qtdVermelho * pesoPorConchaVermelho + qtdBranco * pesoPorConchaBranco;
+
+      let margemExtra = parseFloat(margem.value);
+
+      // Calcular limite máximo para ingredientes + queijos respeitando o peso máximo da massa
+      const pesoMaxIngrQueijo = pesoMaximo - pesoMassa - pesoMolho - margemExtra;
+
+      let fatorAjuste = 1;
+      const somaTotal = somaIngr + somaQueijo;
+      if (somaTotal > pesoMaxIngrQueijo && pesoMaxIngrQueijo > 0) {
+        fatorAjuste = pesoMaxIngrQueijo / somaTotal;
+      }
+
+      // Ajustar ingredientes e queijos proporcionalmente
+      detalhesIngr.forEach(item => {
+        const novoPeso = Math.floor(item.peso * fatorAjuste);
+        item.input.value = novoPeso;
+        item.peso = novoPeso;
+      });
+
+      detalhesQueijo.forEach(item => {
+        const novoPeso = Math.floor(item.peso * fatorAjuste);
+        item.input.value = novoPeso;
+        item.peso = novoPeso;
+      });
+
+      // Recalcular somas ajustadas
+      const somaIngrAjustada = detalhesIngr.reduce((acc, cur) => acc + cur.peso, 0);
+      const somaQueijoAjustada = detalhesQueijo.reduce((acc, cur) => acc + cur.peso, 0);
+
+      const pesoTotalFinal = pesoMassa + pesoMolho + somaIngrAjustada + somaQueijoAjustada + margemExtra;
+
+      // Caso o peso final fique abaixo do mínimo, ajustar a margem para compensar
+      if (pesoTotalFinal < pesoMaximo) {
+        margemExtra += pesoMaximo - pesoTotalFinal;
+      }
+
+      // Mostrar resultados
+      document.getElementById('resMassa').textContent = pesoMassa;
+
+      document.getElementById('resIngredientes').innerHTML =
+        '<h3>Ingredientes escolhidos:</h3>' +
+        (detalhesIngr.length > 0
+          ? detalhesIngr.map(d => `<p>${d.nome}: ${d.peso} g</p>`).join('')
+          : '<p>Sem ingredientes</p>');
+
+      document.getElementById('resMolhos').innerHTML = `
+        <h3>Molhos:</h3>
+        <p>Molho Vermelho: ${qtdVermelho} concha(s) → ${(qtdVermelho * pesoPorConchaVermelho).toFixed(0)} g</p>
+        <p>Molho Branco: ${qtdBranco} concha(s) → ${(qtdBranco * pesoPorConchaBranco).toFixed(0)} g</p>`;
+
+      document.getElementById('resQueijos').innerHTML =
+        '<h3>Queijos escolhidos:</h3>' +
+        (detalhesQueijo.length > 0
+          ? detalhesQueijo.map(d => `<p>${d.nome}: ${d.peso} g</p>`).join('')
+          : '<p>Sem queijos</p>');
+
+      document.getElementById('resTotal').innerHTML = `
+        <h3>Total estimado:</h3>
+        <p><strong>${pesoMassa} (massa) + ${somaIngrAjustada} (ingredientes) + ${somaQueijoAjustada} (queijos) + ${(qtdVermelho * pesoPorConchaVermelho + qtdBranco * pesoPorConchaBranco).toFixed(0)} (molhos) + ${margemExtra.toFixed(0)} (margem)</strong> = <strong>${(pesoMassa + somaIngrAjustada + somaQueijoAjustada + (qtdVermelho * pesoPorConchaVermelho + qtdBranco * pesoPorConchaBranco) + margemExtra).toFixed(0)} g</strong></p>
+      `;
+    });
+  </script>
+</body>
+</html>
